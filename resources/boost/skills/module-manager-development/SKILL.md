@@ -20,26 +20,34 @@ Use this skill when:
 
 ## Module structure
 
-Every module lives in `modules/{ModuleName}/` and must contain a `module.json` manifest and a `Provider.php` service provider. The full convention:
+Every module lives in `modules/{ModuleName}/` and mirrors a standard Laravel project layout. It must contain a `module.json` manifest and an `app/Provider.php` service provider:
 
 ```
 modules/{ModuleName}/
 ├── module.json
-├── Provider.php
-├── Routes/
+├── app/
+│   ├── Provider.php
+│   ├── Models/
+│   ├── Services/
+│   └── Filament/
+│       ├── Resources/
+│       ├── Pages/
+│       └── Widgets/
+├── routes/
 │   └── web.php
-├── Models/
-├── Filament/
-│   ├── Resources/
-│   ├── Pages/
-│   └── Widgets/
-├── Migrations/
-├── Config/
-│   └── config.php
-└── Services/
+├── database/
+│   └── migrations/
+└── config/
+    └── module.php
 ```
 
 Always use `php artisan make:module {Name}` to create modules. Never create the structure manually.
+
+### Autoload
+
+The package registers PSR-4 namespaces at runtime via Composer's ClassLoader. No changes to the host `composer.json` are needed — create a module and it just works.
+
+`Modules\Blog\Models\Post` resolves to `modules/Blog/app/Models/Post.php`, just like `App\Models\User` resolves to `app/Models/User.php` in Laravel.
 
 ## Writing module.json
 
@@ -61,7 +69,7 @@ Rules:
 
 ## Writing Provider.php
 
-The provider must be at `modules/{ModuleName}/Provider.php` with the class name `Provider` and namespace `Modules\{ModuleName}`:
+The provider must be at `modules/{ModuleName}/app/Provider.php` with the class name `Provider` and namespace `Modules\{ModuleName}`:
 
 ```php
 <?php
@@ -88,7 +96,7 @@ Do not register routes, migrations, or config in the module's Provider — the M
 
 ## Writing module routes
 
-Routes go in `modules/{ModuleName}/Routes/web.php`. They are auto-registered with the `web` middleware group:
+Routes go in `modules/{ModuleName}/routes/web.php`. They are auto-registered with the `web` middleware group:
 
 ```php
 <?php
@@ -111,7 +119,7 @@ Use a prefix matching the module name (lowercase) to avoid route collisions betw
 
 ## Writing module config
 
-Place config in `modules/{ModuleName}/Config/config.php`. It is merged under `config('modules.{name_lower}')`:
+Place config in `modules/{ModuleName}/config/module.php`. It is merged under `config('modules.{name_lower}')`:
 
 ```php
 <?php
@@ -130,7 +138,7 @@ config('modules.blog.posts_per_page'); // 15
 
 ## Writing module migrations
 
-Place migration files in `modules/{ModuleName}/Migrations/`. Use standard Laravel migration naming:
+Place migration files in `modules/{ModuleName}/database/migrations/`. Use standard Laravel migration naming:
 
 ```php
 <?php
@@ -167,7 +175,7 @@ php artisan module:migrate-rollback Blog
 
 ## Writing module models
 
-Place Eloquent models in `modules/{ModuleName}/Models/`:
+Place Eloquent models in `modules/{ModuleName}/app/Models/`:
 
 ```php
 <?php
@@ -288,12 +296,12 @@ public function panel(Panel $panel): Panel
 }
 ```
 
-Then place Filament classes in the module's `Filament/` directory:
+Then place Filament classes in the module's `app/Filament/` directory:
 
 ```
-modules/Blog/Filament/Resources/PostResource.php
-modules/Blog/Filament/Pages/BlogDashboard.php
-modules/Blog/Filament/Widgets/LatestPostsWidget.php
+modules/Blog/app/Filament/Resources/PostResource.php
+modules/Blog/app/Filament/Pages/BlogDashboard.php
+modules/Blog/app/Filament/Widgets/LatestPostsWidget.php
 ```
 
 Example resource:
@@ -356,10 +364,11 @@ $module->path;                          // "/path/to/modules/Blog"
 $module->isEnabled();                   // bool
 $module->getNamespace();                // "Modules\Blog"
 $module->getProviderClass();            // "Modules\Blog\Provider"
-$module->getRoutesPath();               // ".../modules/Blog/Routes/web.php"
-$module->getMigrationsPath();           // ".../modules/Blog/Migrations"
-$module->getConfigPath();               // ".../modules/Blog/Config/config.php"
-$module->getFilamentPath('Resources');  // ".../modules/Blog/Filament/Resources"
+$module->getAppPath();                  // ".../modules/Blog/app"
+$module->getRoutesPath();               // ".../modules/Blog/routes/web.php"
+$module->getMigrationsPath();           // ".../modules/Blog/database/migrations"
+$module->getConfigPath();               // ".../modules/Blog/config/module.php"
+$module->getFilamentPath('Resources');  // ".../modules/Blog/app/Filament/Resources"
 $module->toArray();                     // Array representation
 ```
 
@@ -371,3 +380,4 @@ $module->toArray();                     // Array representation
 - Do not modify `modules_statuses.json` directly — use `module:enable` / `module:disable` or the `ModuleManager` API
 - Do not use semver constraints in dependencies — only module names are supported (v1)
 - Do not place module code outside the `modules/` directory — the auto-discovery only scans the configured path
+- All PHP classes (Models, Services, Filament, Provider) go inside `app/` — non-class files (routes, migrations, config) go in their respective lowercase directories

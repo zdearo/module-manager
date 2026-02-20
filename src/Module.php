@@ -43,24 +43,29 @@ class Module
         return config('module-manager.namespace', 'Modules') . '\\' . $this->name;
     }
 
+    public function getAppPath(): string
+    {
+        return $this->path . '/app';
+    }
+
     public function getRoutesPath(): string
     {
-        return $this->path . '/Routes/web.php';
+        return $this->path . '/routes/web.php';
     }
 
     public function getMigrationsPath(): string
     {
-        return $this->path . '/Migrations';
+        return $this->path . '/database/migrations';
     }
 
     public function getConfigPath(): string
     {
-        return $this->path . '/Config/config.php';
+        return $this->path . '/config/module.php';
     }
 
     public function getFilamentPath(string $type): string
     {
-        return $this->path . '/Filament/' . $type;
+        return $this->path . '/app/Filament/' . $type;
     }
 
     public function isEnabled(): bool

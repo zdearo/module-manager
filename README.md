@@ -37,30 +37,28 @@ return [
 php artisan make:module Blog
 ```
 
-This creates the following structure inside `modules/Blog/`:
+This creates the following structure inside `modules/Blog/`, mirroring a standard Laravel project layout:
 
 ```
 modules/Blog/
-├── module.json           # Manifest (name, version, dependencies)
-├── Provider.php          # ServiceProvider
-├── Routes/
+├── module.json              # Manifest (name, version, dependencies)
+├── app/
+│   ├── Provider.php         # ServiceProvider
+│   ├── Models/
+│   ├── Services/
+│   └── Filament/
+│       ├── Resources/
+│       ├── Pages/
+│       └── Widgets/
+├── routes/
 │   └── web.php
-├── Models/
-├── Filament/
-│   ├── Resources/
-│   ├── Pages/
-│   └── Widgets/
-├── Migrations/
-├── Config/
-│   └── config.php
-└── Services/
+├── database/
+│   └── migrations/
+└── config/
+    └── module.php
 ```
 
-By default, the command also adds the `Modules\\` namespace to your host application's `composer.json` autoload and runs `composer dump-autoload`. To skip this:
-
-```bash
-php artisan make:module Blog --no-autoload
-```
+Autoload is handled automatically at runtime by the package — no changes to `composer.json` and no `dump-autoload` needed. Create a module and it just works.
 
 ## Module Manifest
 
@@ -133,10 +131,10 @@ Outputs a table with Name, Version, Status, and Dependencies.
 
 When a module is enabled, the package automatically registers:
 
-1. **ServiceProvider** — `Modules\Blog\Provider` (if the class exists)
-2. **Routes** — `modules/Blog/Routes/web.php` with `web` middleware
-3. **Migrations** — `modules/Blog/Migrations/` included in `php artisan migrate`
-4. **Config** — `modules/Blog/Config/config.php` merged under `config('modules.blog')`
+1. **ServiceProvider** — `Modules\Blog\Provider` (from `app/Provider.php`)
+2. **Routes** — `routes/web.php` with `web` middleware
+3. **Migrations** — `database/migrations/` included in `php artisan migrate`
+4. **Config** — `config/module.php` merged under `config('modules.blog')`
 
 When a module is disabled, none of the above is registered.
 
@@ -213,17 +211,18 @@ public function panel(Panel $panel): Panel
 }
 ```
 
-The plugin automatically discovers Resources, Pages, and Widgets from every enabled module's `Filament/` directory:
+The plugin automatically discovers Resources, Pages, and Widgets from every enabled module's `app/Filament/` directory:
 
 ```
 modules/Blog/
-└── Filament/
-    ├── Resources/
-    │   └── PostResource.php
-    ├── Pages/
-    │   └── BlogDashboard.php
-    └── Widgets/
-        └── LatestPostsWidget.php
+└── app/
+    └── Filament/
+        ├── Resources/
+        │   └── PostResource.php
+        ├── Pages/
+        │   └── BlogDashboard.php
+        └── Widgets/
+            └── LatestPostsWidget.php
 ```
 
 Disable the module and all its Filament components disappear from the panel.
@@ -266,12 +265,13 @@ $module->version;           // "1.0.0"
 $module->dependencies;      // ["Auth"]
 $module->path;              // "/path/to/modules/Blog"
 $module->isEnabled();       // true
-$module->getNamespace();    // "Modules\Blog"
+$module->getNamespace();        // "Modules\Blog"
 $module->getProviderClass();    // "Modules\Blog\Provider"
-$module->getRoutesPath();       // "/path/to/modules/Blog/Routes/web.php"
-$module->getMigrationsPath();   // "/path/to/modules/Blog/Migrations"
-$module->getConfigPath();       // "/path/to/modules/Blog/Config/config.php"
-$module->getFilamentPath('Resources'); // "/path/to/modules/Blog/Filament/Resources"
+$module->getAppPath();          // "/path/to/modules/Blog/app"
+$module->getRoutesPath();       // "/path/to/modules/Blog/routes/web.php"
+$module->getMigrationsPath();   // "/path/to/modules/Blog/database/migrations"
+$module->getConfigPath();       // "/path/to/modules/Blog/config/module.php"
+$module->getFilamentPath('Resources'); // "/path/to/modules/Blog/app/Filament/Resources"
 $module->toArray();
 ```
 
@@ -288,7 +288,6 @@ The package works seamlessly with Laravel Octane:
 | Command | Description |
 |---|---|
 | `make:module {name}` | Create a new module with full directory structure |
-| `make:module {name} --no-autoload` | Create module without modifying `composer.json` |
 | `module:enable {name}` | Enable a module |
 | `module:disable {name}` | Disable a module |
 | `module:disable {name} --force` | Disable ignoring dependents |

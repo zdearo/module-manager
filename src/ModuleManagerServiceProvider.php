@@ -20,7 +20,10 @@ class ModuleManagerServiceProvider extends ServiceProvider
             return new ModuleManager($app);
         });
 
-        $this->app->make(ModuleManager::class)->discover();
+        $manager = $this->app->make(ModuleManager::class);
+        $manager->discover();
+
+        $this->registerAutoload($manager);
     }
 
     public function boot(): void
@@ -43,6 +46,19 @@ class ModuleManagerServiceProvider extends ServiceProvider
         }
 
         $this->configureOctaneWatch();
+    }
+
+    protected function registerAutoload(ModuleManager $manager): void
+    {
+        $loader = require base_path('vendor/autoload.php');
+        $namespace = config('module-manager.namespace', 'Modules');
+
+        foreach ($manager->all() as $module) {
+            $loader->addPsr4(
+                $namespace . '\\' . $module->name . '\\',
+                [$module->path . '/app/']
+            );
+        }
     }
 
     protected function configureOctaneWatch(): void

@@ -4,24 +4,26 @@ This package provides a lightweight modular architecture for Laravel. Each modul
 
 ### Module Directory Convention
 
-Every module lives under the `modules/` directory (configurable via `config('module-manager.path')`) and follows this structure:
+Every module lives under the `modules/` directory (configurable via `config('module-manager.path')`) and mirrors a standard Laravel project layout:
 
 @verbatim
 ```
 modules/{ModuleName}/
-├── module.json           ← Immutable manifest (name, version, dependencies)
-├── Provider.php          ← ServiceProvider (class: Modules\{ModuleName}\Provider)
-├── Routes/
-│   └── web.php           ← Routes (auto-registered with 'web' middleware)
-├── Models/
-├── Filament/
-│   ├── Resources/
-│   ├── Pages/
-│   └── Widgets/
-├── Migrations/           ← Auto-included in `php artisan migrate` when enabled
-├── Config/
-│   └── config.php        ← Merged under config('modules.{name_lower}')
-└── Services/
+├── module.json              ← Immutable manifest (name, version, dependencies)
+├── app/
+│   ├── Provider.php         ← ServiceProvider (class: Modules\{ModuleName}\Provider)
+│   ├── Models/
+│   ├── Services/
+│   └── Filament/
+│       ├── Resources/
+│       ├── Pages/
+│       └── Widgets/
+├── routes/
+│   └── web.php              ← Routes (auto-registered with 'web' middleware)
+├── database/
+│   └── migrations/          ← Auto-included in `php artisan migrate` when enabled
+└── config/
+    └── module.php           ← Merged under config('modules.{name_lower}')
 ```
 @endverbatim
 
@@ -30,8 +32,8 @@ modules/{ModuleName}/
 - **`module.json` is immutable** — it only describes the module (name, version, dependencies). Never modify it programmatically.
 - **Module state** (enabled/disabled) is stored in `storage/app/modules_statuses.json`, not in the module itself.
 - **A new module not present in the statuses file defaults to enabled.**
-- **The Provider class** must always be `{Namespace}\{ModuleName}\Provider` extending `Illuminate\Support\ServiceProvider`.
-- **The root namespace** for all modules is `Modules\` by default (configurable via `config('module-manager.namespace')`).
+- **The Provider class** must always be at `app/Provider.php` with class `Provider` and namespace `Modules\{ModuleName}`.
+- **Autoload is automatic** — the package registers PSR-4 namespaces at runtime via Composer's ClassLoader. No changes to the host `composer.json` needed. All PHP classes (Models, Services, Filament, Provider) live inside `app/`.
 - **Dependencies are by name only** (no semver). Example: `"dependencies": ["Auth", "Payment"]`.
 
 ### Creating a Module
@@ -44,15 +46,7 @@ php artisan make:module Blog
 </code-snippet>
 @endverbatim
 
-This scaffolds the full directory structure, generates `module.json`, `Provider.php`, `Routes/web.php`, and `Config/config.php` from stubs, adds the `Modules\\` PSR-4 namespace to the host `composer.json`, and runs `composer dump-autoload`.
-
-To skip autoload configuration:
-
-@verbatim
-<code-snippet name="Create module without autoload" lang="bash">
-php artisan make:module Blog --no-autoload
-</code-snippet>
-@endverbatim
+This scaffolds the full directory structure and generates `module.json`, `app/Provider.php`, `routes/web.php`, and `config/module.php` from stubs. Autoload is handled at runtime — no `composer.json` changes or `dump-autoload` needed.
 
 ### module.json Format
 
@@ -91,11 +85,11 @@ php artisan module:migrate-rollback Blog
 
 ### Module Config Access
 
-A module's `Config/config.php` is merged under a dot-notated key:
+A module's `config/module.php` is merged under a dot-notated key:
 
 @verbatim
 <code-snippet name="Access module config" lang="php">
-// modules/Blog/Config/config.php returns ['posts_per_page' => 10]
+// modules/Blog/config/module.php returns ['posts_per_page' => 10]
 $value = config('modules.blog.posts_per_page'); // 10
 </code-snippet>
 @endverbatim
@@ -156,7 +150,7 @@ public function panel(Panel $panel): Panel
 
 | Command | Description |
 |---|---|
-| `make:module {name} [--no-autoload]` | Scaffold a new module |
+| `make:module {name}` | Scaffold a new module |
 | `module:enable {name}` | Enable a module |
 | `module:disable {name} [--force] [--cascade]` | Disable a module |
 | `module:list` | List all modules with status |
