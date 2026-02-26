@@ -1,6 +1,6 @@
 ---
 name: module-manager-development
-description: Build and work with ZdearoTech Module Manager — creating modules, managing dependencies, writing module providers, routes, migrations, config, Filament integration, and reacting to module events.
+description: Build and work with Zdtec Module Manager — creating modules, managing dependencies, writing module providers, routes, migrations, config, Filament integration, and reacting to module events.
 ---
 
 # Module Manager Development
@@ -205,7 +205,7 @@ php artisan module:list
 Programmatically:
 
 ```php
-use ZdearoTech\ModuleManager\ModuleManager;
+use Zdtec\ModuleManager\ModuleManager;
 
 $manager = app(ModuleManager::class);
 
@@ -250,7 +250,7 @@ React to module lifecycle changes using standard Laravel event listeners:
 
 namespace App\Listeners;
 
-use ZdearoTech\ModuleManager\Events\ModuleEnabled;
+use Zdtec\ModuleManager\Events\ModuleEnabled;
 
 class HandleModuleEnabled
 {
@@ -267,15 +267,15 @@ Available events:
 
 | Event | Fired when |
 |---|---|
-| `ZdearoTech\ModuleManager\Events\ModuleEnabled` | After a module is enabled |
-| `ZdearoTech\ModuleManager\Events\ModuleDisabled` | After a module is disabled |
-| `ZdearoTech\ModuleManager\Events\ModuleBooted` | After each module is registered during application boot |
+| `Zdtec\ModuleManager\Events\ModuleEnabled` | After a module is enabled |
+| `Zdtec\ModuleManager\Events\ModuleDisabled` | After a module is disabled |
+| `Zdtec\ModuleManager\Events\ModuleBooted` | After each module is registered during application boot |
 
 Register listeners in `EventServiceProvider` or via `Event::listen()`:
 
 ```php
 use Illuminate\Support\Facades\Event;
-use ZdearoTech\ModuleManager\Events\ModuleBooted;
+use Zdtec\ModuleManager\Events\ModuleBooted;
 
 Event::listen(ModuleBooted::class, function (ModuleBooted $event) {
     // Runs for each enabled module during boot
@@ -287,7 +287,7 @@ Event::listen(ModuleBooted::class, function (ModuleBooted $event) {
 To auto-discover Filament Resources, Pages, and Widgets from modules, register the plugin once in your `PanelProvider`:
 
 ```php
-use ZdearoTech\ModuleManager\Filament\FilamentModulePlugin;
+use Zdtec\ModuleManager\Filament\FilamentModulePlugin;
 
 public function panel(Panel $panel): Panel
 {

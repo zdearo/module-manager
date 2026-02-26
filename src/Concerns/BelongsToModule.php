@@ -1,6 +1,6 @@
 <?php
 
-namespace ZdearoTech\ModuleManager\Concerns;
+namespace Zdtec\ModuleManager\Concerns;
 
 use Illuminate\Support\Str;
 

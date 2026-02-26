@@ -1,16 +1,16 @@
 <?php
 
-namespace ZdearoTech\ModuleManager;
+namespace Zdtec\ModuleManager;
 
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
-use ZdearoTech\ModuleManager\Events\ModuleBooted;
-use ZdearoTech\ModuleManager\Events\ModuleDisabled;
-use ZdearoTech\ModuleManager\Events\ModuleEnabled;
-use ZdearoTech\ModuleManager\Exceptions\DependencyException;
-use ZdearoTech\ModuleManager\Exceptions\ModuleNotFoundException;
-use ZdearoTech\ModuleManager\Support\DependencyResolver;
+use Zdtec\ModuleManager\Events\ModuleBooted;
+use Zdtec\ModuleManager\Events\ModuleDisabled;
+use Zdtec\ModuleManager\Events\ModuleEnabled;
+use Zdtec\ModuleManager\Exceptions\DependencyException;
+use Zdtec\ModuleManager\Exceptions\ModuleNotFoundException;
+use Zdtec\ModuleManager\Support\DependencyResolver;
 
 class ModuleManager
 {

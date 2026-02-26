@@ -1,10 +1,10 @@
 <?php
 
-namespace ZdearoTech\ModuleManager\Commands;
+namespace Zdtec\ModuleManager\Commands;
 
 use Illuminate\Console\Command;
-use ZdearoTech\ModuleManager\Exceptions\ModuleNotFoundException;
-use ZdearoTech\ModuleManager\ModuleManager;
+use Zdtec\ModuleManager\Exceptions\ModuleNotFoundException;
+use Zdtec\ModuleManager\ModuleManager;
 
 class ModuleMigrateCommand extends Command
 {

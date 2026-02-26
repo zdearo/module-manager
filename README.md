@@ -1,4 +1,4 @@
-# ZdearoTech Module Manager for Laravel
+# Zdtec Module Manager for Laravel
 
 A lightweight modular architecture package for Laravel. Each module is self-contained with its own routes, models, migrations, config, services, and optional Filament integration. Disable a module and everything disappears. Enable it and everything comes back. Simple.
 
@@ -10,7 +10,7 @@ A lightweight modular architecture package for Laravel. Each module is self-cont
 ## Installation
 
 ```bash
-composer require zdearo-tech/module-manager
+composer require zdtec/module-manager
 ```
 
 The service provider is auto-discovered. No manual registration needed.
@@ -189,7 +189,7 @@ The package dispatches standard Laravel events:
 
 ```php
 // In a ServiceProvider or EventServiceProvider
-use ZdearoTech\ModuleManager\Events\ModuleEnabled;
+use Zdtec\ModuleManager\Events\ModuleEnabled;
 
 Event::listen(ModuleEnabled::class, function (ModuleEnabled $event) {
     logger("Module {$event->module->name} was enabled");
@@ -201,7 +201,7 @@ Event::listen(ModuleEnabled::class, function (ModuleEnabled $event) {
 If you use [Filament](https://filamentphp.com), register the plugin in your `PanelProvider`:
 
 ```php
-use ZdearoTech\ModuleManager\Filament\FilamentModulePlugin;
+use Zdtec\ModuleManager\Filament\FilamentModulePlugin;
 
 public function panel(Panel $panel): Panel
 {
@@ -232,7 +232,7 @@ Disable the module and all its Filament components disappear from the panel.
 You can interact with the `ModuleManager` directly:
 
 ```php
-use ZdearoTech\ModuleManager\ModuleManager;
+use Zdtec\ModuleManager\ModuleManager;
 
 $manager = app(ModuleManager::class);
 

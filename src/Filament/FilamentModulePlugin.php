@@ -1,10 +1,10 @@
 <?php
 
-namespace ZdearoTech\ModuleManager\Filament;
+namespace Zdtec\ModuleManager\Filament;
 
 use Filament\Contracts\Plugin;
 use Filament\Panel;
-use ZdearoTech\ModuleManager\ModuleManager;
+use Zdtec\ModuleManager\ModuleManager;
 
 class FilamentModulePlugin implements Plugin
 {

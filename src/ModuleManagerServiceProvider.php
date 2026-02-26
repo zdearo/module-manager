@@ -1,14 +1,14 @@
 <?php
 
-namespace ZdearoTech\ModuleManager;
+namespace Zdtec\ModuleManager;
 
 use Illuminate\Support\ServiceProvider;
-use ZdearoTech\ModuleManager\Commands\MakeModuleCommand;
-use ZdearoTech\ModuleManager\Commands\ModuleDisableCommand;
-use ZdearoTech\ModuleManager\Commands\ModuleEnableCommand;
-use ZdearoTech\ModuleManager\Commands\ModuleListCommand;
-use ZdearoTech\ModuleManager\Commands\ModuleMigrateCommand;
-use ZdearoTech\ModuleManager\Commands\ModuleMigrateRollbackCommand;
+use Zdtec\ModuleManager\Commands\MakeModuleCommand;
+use Zdtec\ModuleManager\Commands\ModuleDisableCommand;
+use Zdtec\ModuleManager\Commands\ModuleEnableCommand;
+use Zdtec\ModuleManager\Commands\ModuleListCommand;
+use Zdtec\ModuleManager\Commands\ModuleMigrateCommand;
+use Zdtec\ModuleManager\Commands\ModuleMigrateRollbackCommand;
 
 class ModuleManagerServiceProvider extends ServiceProvider
 {

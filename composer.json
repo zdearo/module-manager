@@ -1,11 +1,11 @@
 {
-    "name": "zdearo-tech/module-manager",
+    "name": "zdtec/module-manager",
     "description": "Laravel modular architecture package. Self-contained modules with routes, models, migrations, config, and Filament support.",
     "type": "library",
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "ZdearoTech\\ModuleManager\\": "src/"
+            "Zdtec\\ModuleManager\\": "src/"
         }
     },
     "authors": [
@@ -27,7 +27,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "ZdearoTech\\ModuleManager\\ModuleManagerServiceProvider"
+                "Zdtec\\ModuleManager\\ModuleManagerServiceProvider"
             ]
         }
     },
