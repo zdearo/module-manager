@@ -63,6 +63,16 @@ class Module
         return $this->path . '/config/module.php';
     }
 
+    public function getViewsPath(): string
+    {
+        return $this->path . '/resources/views';
+    }
+
+    public function getLivewireNamespace(): string
+    {
+        return strtolower(preg_replace('/([a-z])([A-Z])/', '$1-$2', $this->name));
+    }
+
     public function getFilamentPath(string $type): string
     {
         return $this->path . '/app/Filament/' . $type;

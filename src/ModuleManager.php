@@ -111,6 +111,15 @@ class ModuleManager
                 require $configPath
             ));
         }
+
+        // 5. Register Livewire component namespace
+        $viewsPath = $module->getViewsPath();
+        if (is_dir($viewsPath) && $this->app->bound('livewire')) {
+            $this->app->make('livewire')->addNamespace(
+                $module->getLivewireNamespace(),
+                viewPath: $viewsPath,
+            );
+        }
     }
 
     /**
