@@ -1,6 +1,6 @@
 <?php
 
-namespace Zdtec\ModuleManager;
+namespace Zdearo\ModuleManager;
 
 class Module
 {

@@ -1,9 +1,9 @@
 <?php
 
-namespace Zdtec\ModuleManager\Events;
+namespace Zdearo\ModuleManager\Events;
 
 use Illuminate\Foundation\Events\Dispatchable;
-use Zdtec\ModuleManager\Module;
+use Zdearo\ModuleManager\Module;
 
 class ModuleEnabled
 {

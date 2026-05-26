@@ -1,11 +1,11 @@
 <?php
 
-namespace Zdtec\ModuleManager\Commands;
+namespace Zdearo\ModuleManager\Commands;
 
 use Illuminate\Console\Command;
-use Zdtec\ModuleManager\Exceptions\DependencyException;
-use Zdtec\ModuleManager\Exceptions\ModuleNotFoundException;
-use Zdtec\ModuleManager\ModuleManager;
+use Zdearo\ModuleManager\Exceptions\DependencyException;
+use Zdearo\ModuleManager\Exceptions\ModuleNotFoundException;
+use Zdearo\ModuleManager\ModuleManager;
 
 class ModuleDisableCommand extends Command
 {

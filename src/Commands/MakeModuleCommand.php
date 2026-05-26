@@ -1,6 +1,6 @@
 <?php
 
-namespace Zdtec\ModuleManager\Commands;
+namespace Zdearo\ModuleManager\Commands;
 
 use Illuminate\Console\Command;
 

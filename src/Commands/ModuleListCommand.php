@@ -1,9 +1,9 @@
 <?php
 
-namespace Zdtec\ModuleManager\Commands;
+namespace Zdearo\ModuleManager\Commands;
 
 use Illuminate\Console\Command;
-use Zdtec\ModuleManager\ModuleManager;
+use Zdearo\ModuleManager\ModuleManager;
 
 class ModuleListCommand extends Command
 {

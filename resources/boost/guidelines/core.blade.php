@@ -1,4 +1,4 @@
-## Zdtec Module Manager
+## Zdearo Module Manager
 
 This package provides a lightweight modular architecture for Laravel. Each module is a self-contained unit with its own routes, models, migrations, config, services, and optional Filament integration. Disabling a module removes all of its registrations; enabling it brings everything back.
 
@@ -98,9 +98,9 @@ $value = config('modules.blog.posts_per_page'); // 10
 
 The package dispatches three events. Listen to them to react to module state changes:
 
-- `Zdtec\ModuleManager\Events\ModuleEnabled` — after enabling
-- `Zdtec\ModuleManager\Events\ModuleDisabled` — after disabling
-- `Zdtec\ModuleManager\Events\ModuleBooted` — after each module is registered during boot
+- `Zdearo\ModuleManager\Events\ModuleEnabled` — after enabling
+- `Zdearo\ModuleManager\Events\ModuleDisabled` — after disabling
+- `Zdearo\ModuleManager\Events\ModuleBooted` — after each module is registered during boot
 
 Each event has a public `Module $module` property.
 
@@ -108,7 +108,7 @@ Each event has a public `Module $module` property.
 
 @verbatim
 <code-snippet name="Using ModuleManager programmatically" lang="php">
-use Zdtec\ModuleManager\ModuleManager;
+use Zdearo\ModuleManager\ModuleManager;
 
 $manager = app(ModuleManager::class);
 
@@ -129,7 +129,7 @@ Register the plugin in your `PanelProvider` to auto-discover Filament Resources,
 
 @verbatim
 <code-snippet name="Register Filament plugin" lang="php">
-use Zdtec\ModuleManager\Filament\FilamentModulePlugin;
+use Zdearo\ModuleManager\Filament\FilamentModulePlugin;
 
 public function panel(Panel $panel): Panel
 {

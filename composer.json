@@ -1,11 +1,11 @@
 {
-    "name": "zdtec/module-manager",
+    "name": "zdearo/module-manager",
     "description": "Laravel modular architecture package. Self-contained modules with routes, models, migrations, config, and Filament support.",
     "type": "library",
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Zdtec\\ModuleManager\\": "src/"
+            "Zdearo\\ModuleManager\\": "src/"
         }
     },
     "authors": [
@@ -16,18 +16,18 @@
     ],
     "require": {
         "php": "^8.2",
-        "illuminate/support": "^11.0|^12.0",
-        "illuminate/console": "^11.0|^12.0",
-        "illuminate/contracts": "^11.0|^12.0",
-        "illuminate/routing": "^11.0|^12.0"
+        "illuminate/support": "^11.0|^12.0|^13.0",
+        "illuminate/console": "^11.0|^12.0|^13.0",
+        "illuminate/contracts": "^11.0|^12.0|^13.0",
+        "illuminate/routing": "^11.0|^12.0|^13.0"
     },
     "require-dev": {
-        "orchestra/testbench": "^9.0|^10.0"
+        "orchestra/testbench": "^9.0|^10.0|^11.0"
     },
     "extra": {
         "laravel": {
             "providers": [
-                "Zdtec\\ModuleManager\\ModuleManagerServiceProvider"
+                "Zdearo\\ModuleManager\\ModuleManagerServiceProvider"
             ]
         }
     },

@@ -1,6 +1,6 @@
 <?php
 
-namespace Zdtec\ModuleManager\Exceptions;
+namespace Zdearo\ModuleManager\Exceptions;
 
 use RuntimeException;
 

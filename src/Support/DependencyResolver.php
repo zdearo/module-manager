@@ -1,9 +1,9 @@
 <?php
 
-namespace Zdtec\ModuleManager\Support;
+namespace Zdearo\ModuleManager\Support;
 
-use Zdtec\ModuleManager\Exceptions\DependencyException;
-use Zdtec\ModuleManager\Module;
+use Zdearo\ModuleManager\Exceptions\DependencyException;
+use Zdearo\ModuleManager\Module;
 
 class DependencyResolver
 {
