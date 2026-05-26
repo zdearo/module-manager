@@ -110,6 +110,74 @@ class ModuleInstallCommandTest extends TestCase
         $this->assertSame('^1.2', $lock['modules']['Product']['constraint']);
     }
 
+    public function test_github_sources_are_cloned_over_https_with_token_auth_for_private_repository_support(): void
+    {
+        $installer = new class extends \Zdearo\ModuleManager\Support\ModuleCatalogInstaller
+        {
+            public array $commands = [];
+
+            public function resolve(string $source, string $ref): string
+            {
+                return $this->resolveSource($source, $ref);
+            }
+
+            protected function runProcess(?string $workingDirectory, string $command): array
+            {
+                $this->commands[] = $command;
+
+                return [];
+            }
+
+            protected function githubToken(): ?string
+            {
+                return 'secret-token';
+            }
+        };
+
+        $repository = $installer->resolve('github:zdtec/erp-modules', 'main');
+
+        $this->assertStringStartsWith(sys_get_temp_dir() . '/module-manager-checkout-', $repository);
+        $this->assertCount(1, $installer->commands);
+        $this->assertMatchesRegularExpression("/git clone --quiet --branch '?main'? --depth 1/", $installer->commands[0]);
+        $this->assertStringContainsString('https://github.com/zdtec/erp-modules.git', $installer->commands[0]);
+        $this->assertStringContainsString('GIT_ASKPASS=', $installer->commands[0]);
+        $this->assertStringNotContainsString('secret-token', $installer->commands[0]);
+    }
+
+    public function test_github_tags_are_listed_over_https_with_token_auth_for_private_repository_support(): void
+    {
+        $installer = new class extends \Zdearo\ModuleManager\Support\ModuleCatalogInstaller
+        {
+            public array $commands = [];
+
+            public function tags(string $source): array
+            {
+                return $this->listTags($source);
+            }
+
+            protected function runProcess(?string $workingDirectory, string $command): array
+            {
+                $this->commands[] = $command;
+
+                return [
+                    '91d3c9efe6333920388bf82bd26a4970512f7385 refs/tags/product-v1.2.0',
+                ];
+            }
+
+            protected function githubToken(): ?string
+            {
+                return 'secret-token';
+            }
+        };
+
+        $this->assertSame(['product-v1.2.0'], $installer->tags('github:zdtec/erp-modules'));
+        $this->assertCount(1, $installer->commands);
+        $this->assertStringContainsString('git ls-remote --tags --refs', $installer->commands[0]);
+        $this->assertStringContainsString('https://github.com/zdtec/erp-modules.git', $installer->commands[0]);
+        $this->assertStringContainsString('GIT_ASKPASS=', $installer->commands[0]);
+        $this->assertStringNotContainsString('secret-token', $installer->commands[0]);
+    }
+
     public function test_update_reinstalls_locked_module_and_refreshes_lock_metadata(): void
     {
         $repository = $this->createRepositoryFixture([

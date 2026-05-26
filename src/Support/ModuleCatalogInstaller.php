@@ -132,7 +132,7 @@ class ModuleCatalogInstaller
         }
 
         if (str_starts_with($source, 'github:')) {
-            return $this->downloadGithubRepository(substr($source, 7), $ref);
+            return $this->cloneGithubRepository(substr($source, 7), $ref);
         }
 
         throw new RuntimeException('Unsupported module source. Use github:owner/repo or path:/absolute/repo.');
@@ -196,7 +196,7 @@ class ModuleCatalogInstaller
                 throw new RuntimeException("Invalid GitHub repository [{$repository}].");
             }
 
-            $lines = $this->runProcess(null, 'git ls-remote --tags --refs ' . escapeshellarg("https://github.com/{$repository}.git"));
+            $lines = $this->runGithubProcess('git ls-remote --tags --refs ' . escapeshellarg($this->githubRepositoryUrl($repository)));
             $tags = [];
 
             foreach ($lines as $line) {
@@ -218,6 +218,107 @@ class ModuleCatalogInstaller
         $this->runProcess(null, 'git clone --quiet --branch ' . escapeshellarg($ref) . ' --depth 1 ' . escapeshellarg($path) . ' ' . escapeshellarg($target));
 
         return $target;
+    }
+
+    protected function cloneGithubRepository(string $repository, string $ref): string
+    {
+        if (! preg_match('/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/', $repository)) {
+            throw new RuntimeException("Invalid GitHub repository [{$repository}].");
+        }
+
+        $target = sys_get_temp_dir() . '/module-manager-checkout-' . bin2hex(random_bytes(8));
+
+        $this->runGithubProcess('git clone --quiet --branch ' . escapeshellarg($ref) . ' --depth 1 ' . escapeshellarg($this->githubRepositoryUrl($repository)) . ' ' . escapeshellarg($target));
+
+        return $target;
+    }
+
+    protected function githubRepositoryUrl(string $repository): string
+    {
+        return "https://github.com/{$repository}.git";
+    }
+
+    protected function runGithubProcess(string $command): array
+    {
+        $token = $this->githubToken();
+
+        if ($token === null) {
+            return $this->runProcess(null, 'GIT_TERMINAL_PROMPT=0 ' . $command);
+        }
+
+        $askPassPath = $this->writeGithubAskPassScript($token);
+
+        try {
+            return $this->runProcess(null, 'GIT_ASKPASS=' . escapeshellarg($askPassPath) . ' GIT_TERMINAL_PROMPT=0 ' . $command);
+        } finally {
+            @unlink($askPassPath);
+        }
+    }
+
+    protected function githubToken(): ?string
+    {
+        foreach (['GITHUB_TOKEN', 'GH_TOKEN'] as $key) {
+            $token = getenv($key);
+
+            if (is_string($token) && $token !== '') {
+                return $token;
+            }
+        }
+
+        $composerAuth = getenv('COMPOSER_AUTH');
+
+        if (is_string($composerAuth) && $composerAuth !== '') {
+            $token = $this->githubTokenFromComposerAuth($composerAuth);
+
+            if ($token !== null) {
+                return $token;
+            }
+        }
+
+        $home = getenv('HOME') ?: '';
+        $composerHome = getenv('COMPOSER_HOME') ?: ($home !== '' ? $home . '/.config/composer' : '');
+        $paths = array_filter(array_unique([
+            $composerHome !== '' ? $composerHome . '/auth.json' : '',
+            $home !== '' ? $home . '/.config/composer/auth.json' : '',
+            $home !== '' ? $home . '/.composer/auth.json' : '',
+        ]));
+
+        foreach ($paths as $path) {
+            if (! is_file($path)) {
+                continue;
+            }
+
+            $token = $this->githubTokenFromComposerAuth((string) file_get_contents($path));
+
+            if ($token !== null) {
+                return $token;
+            }
+        }
+
+        return null;
+    }
+
+    protected function githubTokenFromComposerAuth(string $json): ?string
+    {
+        $auth = json_decode($json, true);
+        $token = is_array($auth) ? ($auth['github-oauth']['github.com'] ?? null) : null;
+
+        return is_string($token) && $token !== '' ? $token : null;
+    }
+
+    protected function writeGithubAskPassScript(string $token): string
+    {
+        $path = sys_get_temp_dir() . '/module-manager-github-askpass-' . bin2hex(random_bytes(8));
+        $script = "#!/bin/sh\n"
+            . "case \"\$1\" in\n"
+            . '*Username*) printf ' . escapeshellarg('%s\n') . ' ' . escapeshellarg('x-access-token') . " ;;\n"
+            . '*) printf ' . escapeshellarg('%s\n') . ' ' . escapeshellarg($token) . " ;;\n"
+            . "esac\n";
+
+        file_put_contents($path, $script);
+        chmod($path, 0700);
+
+        return $path;
     }
 
     protected function downloadGithubRepository(string $repository, string $ref): string
