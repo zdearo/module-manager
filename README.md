@@ -28,6 +28,7 @@ return [
     'path'          => base_path('modules'),     // Where modules live
     'namespace'     => 'Modules',                // Root namespace for all modules
     'statuses_path' => storage_path('app/modules_statuses.json'), // Enabled/disabled state
+    'lock_path'     => base_path('modules.lock.json'), // Catalog install lock file
 ];
 ```
 
@@ -60,6 +61,82 @@ modules/Blog/
 
 Autoload is handled automatically at runtime by the package — no changes to `composer.json` and no `dump-autoload` needed. Create a module and it just works.
 
+## Installing Modules From a Catalog
+
+Modules can also be installed from a GitHub repository that exposes a `modules.json` catalog:
+
+```bash
+php artisan module:install github:zdtec/erp-modules Product
+php artisan module:install github:zdtec/erp-modules Pricing
+```
+
+By default, the installer downloads the `main` archive, reads `modules.json`, installs the requested module and its manifest dependencies into `config('module-manager.path')`, then records the source in `modules.lock.json`.
+
+To install a version range, put a constraint after the module name. The installer looks for module tags like `product-v1.2.0`, chooses the highest compatible tag, and verifies the installed `module.json` version:
+
+```bash
+php artisan module:install github:zdtec/erp-modules Product:^1.2
+```
+
+You can also pin any explicit Git ref:
+
+```bash
+php artisan module:install github:zdtec/erp-modules Product --ref=product-v1.2.3
+```
+
+For local development or tests, use a path source:
+
+```bash
+php artisan module:install path:/absolute/path/to/erp-modules Pricing
+```
+
+A catalog looks like this:
+
+```json
+{
+    "name": "zdtec/erp-modules",
+    "modules": {
+        "Product": {
+            "path": "modules/Product"
+        },
+        "Pricing": {
+            "path": "modules/Pricing"
+        }
+    }
+}
+```
+
+The catalog is only an index. Module versions and dependencies live in each module's `module.json`.
+
+Installed modules are tracked in `modules.lock.json`:
+
+```json
+{
+    "modules": {
+        "Product": {
+            "source": "github:zdtec/erp-modules",
+            "ref": "main",
+            "path": "modules/Product",
+            "version": "1.0.0",
+            "dependencies": [],
+            "constraint": "^1.0",
+            "installed_at": "2026-05-26T12:00:00+00:00"
+        }
+    }
+}
+```
+
+Update or remove catalog-installed modules with:
+
+```bash
+php artisan module:update Product
+php artisan module:update
+php artisan module:remove Product
+php artisan module:remove Product --force
+```
+
+`module:remove` refuses to remove a module when another locked module depends on it unless `--force` is used.
+
 ## Module Manifest
 
 Each module has an immutable `module.json` that describes it:
@@ -76,7 +153,7 @@ Each module has an immutable `module.json` that describes it:
 - **name** — Module name (must match the directory name)
 - **description** — Optional description
 - **version** — Module version
-- **dependencies** — Array of module names this module depends on (by name, no semver constraints)
+- **dependencies** — Array of module names this module depends on
 
 > The `module.json` is never modified by the package. It only describes the module.
 

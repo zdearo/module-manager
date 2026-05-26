@@ -3,12 +3,17 @@
 namespace Zdearo\ModuleManager;
 
 use Illuminate\Support\ServiceProvider;
+use Composer\Autoload\ClassLoader;
+use RuntimeException;
 use Zdearo\ModuleManager\Commands\MakeModuleCommand;
 use Zdearo\ModuleManager\Commands\ModuleDisableCommand;
 use Zdearo\ModuleManager\Commands\ModuleEnableCommand;
+use Zdearo\ModuleManager\Commands\ModuleInstallCommand;
 use Zdearo\ModuleManager\Commands\ModuleListCommand;
 use Zdearo\ModuleManager\Commands\ModuleMigrateCommand;
 use Zdearo\ModuleManager\Commands\ModuleMigrateRollbackCommand;
+use Zdearo\ModuleManager\Commands\ModuleRemoveCommand;
+use Zdearo\ModuleManager\Commands\ModuleUpdateCommand;
 
 class ModuleManagerServiceProvider extends ServiceProvider
 {
@@ -39,9 +44,12 @@ class ModuleManagerServiceProvider extends ServiceProvider
                 MakeModuleCommand::class,
                 ModuleEnableCommand::class,
                 ModuleDisableCommand::class,
+                ModuleInstallCommand::class,
                 ModuleListCommand::class,
                 ModuleMigrateCommand::class,
                 ModuleMigrateRollbackCommand::class,
+                ModuleRemoveCommand::class,
+                ModuleUpdateCommand::class,
             ]);
         }
 
@@ -50,7 +58,7 @@ class ModuleManagerServiceProvider extends ServiceProvider
 
     protected function registerAutoload(ModuleManager $manager): void
     {
-        $loader = require base_path('vendor/autoload.php');
+        $loader = $this->resolveComposerLoader();
         $namespace = config('module-manager.namespace', 'Modules');
 
         foreach ($manager->all() as $module) {
@@ -59,6 +67,27 @@ class ModuleManagerServiceProvider extends ServiceProvider
                 [$module->path . '/app/']
             );
         }
+    }
+
+    protected function resolveComposerLoader(): ClassLoader
+    {
+        $loaders = ClassLoader::getRegisteredLoaders();
+
+        if ($loaders !== []) {
+            return reset($loaders);
+        }
+
+        $autoloadPath = base_path('vendor/autoload.php');
+
+        if (file_exists($autoloadPath)) {
+            $loader = require $autoloadPath;
+
+            if ($loader instanceof ClassLoader) {
+                return $loader;
+            }
+        }
+
+        throw new RuntimeException('Unable to resolve Composer autoloader for module registration.');
     }
 
     protected function configureOctaneWatch(): void

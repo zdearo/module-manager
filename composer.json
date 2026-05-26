@@ -8,6 +8,11 @@
             "Zdearo\\ModuleManager\\": "src/"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Zdearo\\ModuleManager\\Tests\\": "tests/"
+        }
+    },
     "authors": [
         {
             "name": "Adryel Dearo",
@@ -16,6 +21,8 @@
     ],
     "require": {
         "php": "^8.2",
+        "composer/semver": "^3.4",
+        "ext-zip": "*",
         "illuminate/support": "^11.0|^12.0|^13.0",
         "illuminate/console": "^11.0|^12.0|^13.0",
         "illuminate/contracts": "^11.0|^12.0|^13.0",
